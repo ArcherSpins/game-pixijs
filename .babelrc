@@ -1,0 +1,16 @@
+{
+  "exclude": "node_modules/**",
+  "plugins": [
+    [
+      "@babel/proposal-optional-chaining", { "loose": false }],
+    [
+      "@babel/proposal-pipeline-operator", { "proposal": "minimal" }],
+    [
+      "@babel/proposal-nullish-coalescing-operator", { "loose": false }],
+    "@babel/proposal-export-namespace-from",
+    "@babel/proposal-numeric-separator",
+    "@babel/syntax-dynamic-import",
+    [
+      "@babel/proposal-class-properties", { "loose": false }]
+  ]
+}
