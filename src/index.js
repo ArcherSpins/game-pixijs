@@ -1,7 +1,7 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-import * as PIXI from 'pixi.js';
-import Ship from './Ship';
+import * as PIXI from "pixi.js";
+import Ship from "./Ship";
 // import leftBg from './assets/bg/left_min.png';
 // import rightBg from './assets/bg/right_min.png';
 
@@ -35,29 +35,43 @@ const SPEED = 10;
 
 const KEYS = {
   left: 37,
-  right: 39
-}
+  right: 39,
+};
 
 const defaultEnemy = {
-  username: 'eee',
+  username: "eee",
   allocation: [],
   portfolioId: 9,
-  y: -100,
-  profit: 'e'
-}
+  profit: "e",
+};
 
 const players = [
-  { ...defaultEnemy },
-  { ...defaultEnemy },
-  { ...defaultEnemy },
   {
-    username: 'dsd',
+    username: "enemy1",
     allocation: [],
-    portfolioId: 9,
-    profit: 'e',
-    user: 'me'
-  }
-]
+    portfolioId: 1,
+    profit: 0,
+  },
+  {
+    username: "enemy2",
+    allocation: [],
+    portfolioId: 2,
+    profit: 0,
+  },
+  {
+    username: "enemy3",
+    allocation: [],
+    portfolioId: 3,
+    profit: 0,
+  },
+  {
+    username: "dsd",
+    allocation: [],
+    portfolioId: 4,
+    profit: 0,
+    user: "me",
+  },
+];
 
 function moveBgSpace() {
   left.tilePosition.y += 0.75;
@@ -73,8 +87,8 @@ function createEnemy() {
   }
 }
 
-const chooseNewPlayers = players => {
-  const userIndex = players.findIndex(player => player.user === 'me');
+const chooseNewPlayers = (players) => {
+  const userIndex = players.findIndex((player) => player.user === "me");
   let newPlayers;
   if (userIndex > -1) {
     if (userIndex <= 2) {
@@ -97,17 +111,17 @@ const chooseNewPlayers = players => {
 };
 
 function renderBg() {
-  const backTexture = PIXI.Texture.fromImage('./assets/bg/back_layer.jpg');
+  const backTexture = PIXI.Texture.fromImage("./assets/bg/back_layer.jpg");
   back = new PIXI.extras.TilingSprite(backTexture, 1209, 1160);
   back.position.x = 0;
   back.position.y = 0;
 
-  const leftTexture = PIXI.Texture.fromImage('./assets/bg/left_min.png');
+  const leftTexture = PIXI.Texture.fromImage("./assets/bg/left_min.png");
   left = new PIXI.extras.TilingSprite(leftTexture, 350, 1160);
   left.position.x = 0;
   left.position.y = 0;
 
-  const rightTexture = PIXI.Texture.fromImage('./assets/bg/right_min.png');
+  const rightTexture = PIXI.Texture.fromImage("./assets/bg/right_min.png");
   right = new PIXI.extras.TilingSprite(rightTexture, 600, 1160);
   right.position.x = app.view.width / 2 - 300;
   right.position.y = 0;
@@ -116,15 +130,14 @@ function renderBg() {
   app.stage.addChild(back, left, right);
 }
 
-
 const initShips = async (up = true) => {
   height = app.view.height / 2;
   width = app.view.width / 2;
 
   mainOffsetX = width / (chosenPlayers.length + 1);
-  mainOffsetY = height / 3;
+  mainOffsetY = height;
 
-  const promises = chosenPlayers.map(async player => {
+  const promises = chosenPlayers.map(async (player) => {
     const { username, allocation, portfolioId, profit, y } = player;
     return {
       png: await import(`./assets/ship/skeleton.png`),
@@ -142,7 +155,8 @@ const initShips = async (up = true) => {
     const i = index + 1;
     const x = mobile ? -40 + mainOffsetX * i + 10 * i : -10 + mainOffsetX * i;
     let ship;
-    if (chosenPlayers[index].user === 'me' && myShip) {
+    console.log(chosenPlayers[index].user === "me");
+    if (chosenPlayers[index].user === "me" && myShip) {
       ship = myShip;
     } else {
       ship = new Ship(
@@ -153,16 +167,15 @@ const initShips = async (up = true) => {
         up ? height : -200,
         data.username,
         data.allocation,
-        mobile,
-        { y: data.y }
+        mobile
       );
       app.stage.addChild(ship.container);
-      if (chosenPlayers[index].user === 'me') {
+      if (chosenPlayers[index].user === "me") {
         myShip = ship;
-        ship.setSelection();
+        // ship.setSelection();
       } else {
-        window.ship = ship
-        ship.rotate(50.28)
+        // window.ship = ship;
+        ship.rotate(6.3);
       }
     }
     if (data.profit) {
@@ -183,19 +196,26 @@ const initShips = async (up = true) => {
     shipsMap[data.portfolioId] = ship;
     return ship;
   });
-  await Promise.all(ships.map(ship => ship.moveToYWithAnimation(mainOffsetY)));
+  await Promise.all(
+    ships.map((ship, i) => {
+      console.log(chosenPlayers[i]);
+      ship.moveToYWithAnimation(
+        chosenPlayers[i].user === "me" ? mainOffsetY : mainOffsetY - 200
+      );
+    })
+  );
 };
 
 function movePlayer(ship) {
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener("keydown", (e) => {
     if (!myShip) return;
     if (e.keyCode === KEYS.left) {
-      myShip.moveTo(-SPEED, 'x')
+      myShip.moveTo(-SPEED, "x");
     }
     if (e.keyCode === KEYS.right) {
-      myShip.moveTo(SPEED, 'x')
+      myShip.moveTo(SPEED, "x");
     }
-  })
+  });
 }
 
 export default function init(players, config, isMobile) {
@@ -219,12 +239,11 @@ export default function init(players, config, isMobile) {
   app.loader.load(onLoaded);
 
   app.stage.interactive = true;
-  window.app = app
-  
+  window.app = app;
+
   function animate() {
     window.requestAnimationFrame(animate);
     PIXI.tweenManager.update();
-
   }
   animate();
   movePlayer();
@@ -232,8 +251,8 @@ export default function init(players, config, isMobile) {
   function onLoaded() {
     renderBg();
     app.ticker.add(moveBgSpace);
-
-    chosenPlayers = chooseNewPlayers(players);
+    console.log(players);
+    chosenPlayers = players;
     initShips(config);
     // initShips(players, config);
   }
@@ -246,4 +265,4 @@ export default function init(players, config, isMobile) {
 //   app.view.style.height = document.body.clientHeight;
 // })
 
-init(players)
+init(players);

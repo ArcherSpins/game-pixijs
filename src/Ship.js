@@ -1,13 +1,30 @@
-import { Sprite, Container, Text, TextStyle, spine, BaseTexture } from 'pixi.js';
-import 'pixi-spine';
+import {
+  Sprite,
+  Container,
+  Text,
+  TextStyle,
+  spine,
+  BaseTexture,
+} from "pixi.js";
+import "pixi-spine";
 
-import * as shipBorder from './assets/light.png';
+import * as shipBorder from "./assets/light.png";
 
-import 'pixi-tween';
+console.log(shipBorder);
 
+import "pixi-tween";
 
 export default class Ship {
-  constructor(shipJson, shipAtlas, shipPng, containerX, containerY, username, allocation, mobile, defaultPosition) {
+  constructor(
+    shipJson,
+    shipAtlas,
+    shipPng,
+    containerX,
+    containerY,
+    username,
+    allocation,
+    mobile
+  ) {
     this.containerX = containerX;
     this.containerY = containerY;
     this.username = username;
@@ -20,7 +37,7 @@ export default class Ship {
     // this.x = containerX;
     // this.y = 100;
     this.buildShip(shipJson, shipAtlas, shipPng);
-    this.initPosition(defaultPosition?.x || 0, defaultPosition?.y || 0);
+    this.initPosition(0, 0);
     this.portfolio = new PIXI.Container();
     this.initPortfolio();
     this.initProfit();
@@ -42,15 +59,15 @@ export default class Ship {
 
     this.ship = new spine.Spine(spineData);
 
-    this.ship.skeleton.setSkinByName('default');
+    this.ship.skeleton.setSkinByName("default");
     this.ship.skeleton.setSlotsToSetupPose();
 
-    this.ship.state.setAnimation(0, 'idle', true);
+    this.ship.state.setAnimation(0, "idle", true);
 
-    this.ship.stateData.setMix('idle', 'hyper_start');
-    this.ship.stateData.setMix('hyper_start', 'hyper');
-    this.ship.stateData.setMix('hyper', 'hyper_stop');
-    this.ship.stateData.setMix('hyper_stop', 'idle');
+    this.ship.stateData.setMix("idle", "hyper_start");
+    this.ship.stateData.setMix("hyper_start", "hyper");
+    this.ship.stateData.setMix("hyper", "hyper_stop");
+    this.ship.stateData.setMix("hyper_stop", "idle");
 
     this.ship.rotation = 3.14159;
     this.ship.interactive = true;
@@ -74,6 +91,7 @@ export default class Ship {
   }
 
   rotate(rotation) {
+    this.ship.pivot.set(0, -this.ship.height);
     this.ship.rotation = rotation;
   }
 
@@ -97,8 +115,8 @@ export default class Ship {
     // this.tweenMoveY.start();
   }
 
-  moveToYWithAnimation = y => {
-    return new Promise(resolve => {
+  moveToYWithAnimation = (y) => {
+    return new Promise((resolve) => {
       const duration = 1500;
       if (this.tweenMoveY) this.tweenMoveY.stop();
 
@@ -109,7 +127,7 @@ export default class Ship {
       this.tweenMoveY.to({ y });
       this.tweenMoveY.time = duration;
 
-      this.tweenMoveY.on('end', () => {
+      this.tweenMoveY.on("end", () => {
         // this.container.destroy();
         // this.ship.state.setAnimation(0, 'hyper_stop', false);
         // this.ship.state.setAnimation(0, 'idle', true, 30);
@@ -130,14 +148,19 @@ export default class Ship {
     // profit and username
     const style = new TextStyle({
       fontSize: this.fontSize,
-      fill: 'white',
+      fill: "white",
     });
 
     this.profitText = new Text(`0.000000%`, style);
-    this.usernameText = new Text(this.username.length - 12 > 1 ? `${this.username.substr(0, 12)}...` : this.username, {
-      fontSize: this.fontSize,
-      fill: 'white',
-    });
+    this.usernameText = new Text(
+      this.username.length - 12 > 1
+        ? `${this.username.substr(0, 12)}...`
+        : this.username,
+      {
+        fontSize: this.fontSize,
+        fill: "white",
+      }
+    );
     if (this.mobile) {
       this.usernameText.x = 0 - this.usernameText.width / 2;
       this.usernameText.y = 215 + this.fontSize;
@@ -201,7 +224,7 @@ export default class Ship {
 
   setProfit(value) {
     const points = Math.round(value * 1000000) / 1000000;
-    const textColor = 'white'; // points < 0 ? 0x191919 : 0x272527;
+    const textColor = "white"; // points < 0 ? 0x191919 : 0x272527;
     const bgColor = points < 0 ? 0xdb2f18 : 0x10a643;
     this.profitText.text = `${points}%`;
 
@@ -223,7 +246,7 @@ export default class Ship {
   }
 
   setAnimation(type) {
-    if (type === 'move') {
+    if (type === "move") {
       // this.ship.state.setAnimation(0, 'hyper_start', true);
       // this.ship.state.setAnimation(1, 'idle', true);
     }
@@ -231,6 +254,7 @@ export default class Ship {
 
   setSelection() {
     this.selection = Sprite.from(shipBorder);
+    console.log(this.selection);
     this.selection.x = -70;
     this.selection.y = -22;
     this.selection.scale.x = 0.5;
@@ -246,12 +270,12 @@ export default class Ship {
           ? {
               amount: new Text(`${currency}%`, {
                 fontSize: 10,
-                fill: 'white',
+                fill: "white",
               }),
             }
-          : null,
+          : null
       )
-      .filter(currency => currency);
+      .filter((currency) => currency);
 
     this.portfolioBorder = new PIXI.Graphics();
     this.portfolioBorder.lineStyle(1, 0x092d33, 0.6);
@@ -319,7 +343,7 @@ export default class Ship {
       this.ship,
       // this.profitText,
       this.info,
-      this.portfolio,
+      this.portfolio
     );
     const rect = this.container.getBounds();
     this.contBorder = new PIXI.Graphics();
